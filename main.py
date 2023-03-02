@@ -5,6 +5,8 @@ from random import randint
 try:
     import pygame
     import noise
+    import pygame_widgets
+    from pygame_widgets.button import Button
 except ModuleNotFoundError:
     import setup
 
@@ -16,6 +18,7 @@ BLUE_SKY = (26, 179, 255)
 GRASS_BLOCK = (27, 72, 10)
 STONE_BLOCK = (60, 63, 65)
 DIRT_BLOCK = (60, 63, 65)
+BLACK = (0, 0, 0)
 
 # Used when Blocks didn't have textures
 block_colors = {"grass": GRASS_BLOCK, "stone": STONE_BLOCK, "dirt": DIRT_BLOCK}
@@ -26,12 +29,14 @@ BLOCK_SIZE = 32  # Texture resolution
 
 WINDOW_WIDTH = pygame.display.Info().current_w // BLOCK_SIZE * BLOCK_SIZE
 WINDOW_HEIGHT = pygame.display.Info().current_h // BLOCK_SIZE * BLOCK_SIZE
-
+print(WINDOW_HEIGHT, WINDOW_WIDTH)
 FONT_SIZE = WINDOW_WIDTH // 50
 FPS = 60
-SEED = randint(0, 20)
+SEED = randint(1, 20)
 WORLD_SIZE = WINDOW_WIDTH // BLOCK_SIZE
-NEW_GAME = False
+print(WORLD_SIZE)
+
+NEW_GAME = True
 SHOW_UI = True
 
 
@@ -39,6 +44,7 @@ world_width = WINDOW_WIDTH // BLOCK_SIZE
 world_height = WINDOW_HEIGHT // BLOCK_SIZE
 
 current_mode = "Mode: Dig"
+game_status = "menu"
 
 all_sprites = pygame.sprite.Group()
 player_sprite = pygame.sprite.Group()
@@ -244,7 +250,7 @@ def handle_event(event, player, font):
 def create_world():
     game_world = [[None for y in range(world_height)] for x in range(WORLD_SIZE)]
     noise_map_surface = generate_noise_map(WORLD_SIZE, 5, 1, 0.5, 2, SEED)
-    noise_map_stone = generate_noise_map(WORLD_SIZE, 5, 1, 0.5, 2, SEED + 4)
+    noise_map_stone = generate_noise_map(WORLD_SIZE, 3, 1, 0.5, 2, SEED // 2 + 1)
 
     for x in range(WORLD_SIZE):
         noise_value = noise_map_surface[x]
@@ -271,6 +277,7 @@ def create_world():
             if isinstance(game_world[x][y + 1], Block) and game_world[x][y] is None:
                 if game_world[x][y + 1].block_type == "dirt":
                     game_world[x][y] = Block("grass", x, y, BLOCK_SIZE)
+    print(game_world)
     return game_world, player
 
 
@@ -285,12 +292,10 @@ def draw_all(game_world, screen):
     player_sprite.draw(screen)
 
 
-def main():
+def game(clock, screen, font):
     global game_world, current_mode
 
-    font = pygame.font.Font(pygame.font.get_default_font(), FONT_SIZE)
 
-    screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("Blockers 2D")
 
     if NEW_GAME:
@@ -299,7 +304,6 @@ def main():
         game_world, player = load_game()
 
     running = True
-    clock = pygame.time.Clock()
 
     while running:
         for event in pygame.event.get():
@@ -332,5 +336,53 @@ def main():
     pygame.quit()
 
 
+def main_menu(clock, screen, font, main_font):
+    screen.fill(BLACK)
+
+    # fon = pygame.transform.scale(load_image('bg.png'), (500, 500))
+    # screen.blit(fon, (300, 0))
+
+    button = Button(
+        screen, 100, 100, 300, 150, text='Start New Game',
+        fontSize=50, margin=20,
+        inactiveColour=(255, 0, 0),
+        pressedColour=(0, 255, 0), radius=20,
+        onClick=lambda: game(clock, screen, font),
+        font=main_font
+    )
+
+    running_status = 1
+    while running_status == 1:
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.QUIT:
+                close()
+                print("QUIT")
+                break
+            # if event.type == pygame.MOUSEBUTTONUP:
+            #     print("CLICK")
+            #     running_status = 0
+            #     break
+        # else:
+        #     close()
+        pygame_widgets.update(events)
+        # button.draw()
+        name_label = main_font.render("Blockers 2D", 1, (0, 255, 0))
+        screen.blit(name_label, (WINDOW_WIDTH // 2 - 40, 20))
+
+        clock.tick(FPS)
+        pygame.display.flip()
+
+
+    if running_status == 0:
+        game(clock, screen, font)
+
+
 if __name__ == "__main__":
-    main()
+    # Main Components Initialization
+    clock = pygame.time.Clock()
+    font = pygame.font.Font("fonts/Cool_Font.ttf", FONT_SIZE)
+    main_font = pygame.font.Font("fonts/Cool_Font.ttf", 50)
+    screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+
+    main_menu(clock, screen, font, main_font)

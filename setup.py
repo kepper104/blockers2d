@@ -10,3 +10,4 @@ def install(package):
 
 install('pygame')
 install('packages/noise-1.2.3-cp38-cp38-win_amd64.whl')
+install('pygame_widgets')
