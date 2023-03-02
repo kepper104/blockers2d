@@ -9,6 +9,7 @@ try:
     from pygame_widgets.button import Button
 except ModuleNotFoundError:
     import setup
+    print()
     print("All missing Packages were installed, please restart the program now")
     exit(0)
 
@@ -67,7 +68,7 @@ def generate_noise_map(width, scale, octaves, persistence, lacunarity, seed):
 
 
 def load_image(name):
-    fullname = os.path.join('sprites', name)
+    fullname = os.path.join('../sprites', name)
     if not os.path.isfile(fullname):
         print(f"File '{fullname}' not found")
         sys.exit()
@@ -353,7 +354,7 @@ def main_menu(clock, screen, font, main_font):
         font=font
     )
     try:
-        f = open('save.txt', 'r')
+        f = open('../save.txt', 'r')
         f.close()
     except FileNotFoundError:
         continue_button.onClick = lambda: print("Save Not Found!")
@@ -396,8 +397,8 @@ def main_menu(clock, screen, font, main_font):
 if __name__ == "__main__":
     # Main Components Initialization
     clock = pygame.time.Clock()
-    font = pygame.font.Font("fonts/Cool_Font.ttf", FONT_SIZE)
-    main_font = pygame.font.Font("fonts/Cool_Font.ttf", 100)
+    font = pygame.font.Font("../fonts/Cool_Font.ttf", FONT_SIZE)
+    main_font = pygame.font.Font("../fonts/Cool_Font.ttf", 100)
     screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
     main_menu(clock, screen, font, main_font)
