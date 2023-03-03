@@ -49,7 +49,7 @@ player_sprite = pygame.sprite.Group()
 
 def close():
     pygame.quit()
-    exit(0)
+    sys.exit(0)
 
 
 def generate_noise_map(width, scale, octaves, persistence, lacunarity, seed):
