@@ -354,7 +354,7 @@ def main_menu(clock, screen, font, main_font):
         font=font
     )
     try:
-        f = open('../save.txt', 'r')
+        f = open('save.txt', 'r')
         f.close()
     except FileNotFoundError:
         continue_button.onClick = lambda: print("Save Not Found!")
